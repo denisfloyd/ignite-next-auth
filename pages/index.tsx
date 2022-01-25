@@ -1,15 +1,17 @@
-import { useState, FormEvent, useContext } from "react";
-import type { NextPage } from "next";
+import { GetServerSideProps } from 'next';
+import { FormEvent, useState } from 'react';
 
-import { AuthContext } from "../contexts/AuthContext";
+import { useAuth } from '../hooks/useAuth';
 
-import styles from "../styles/Home.module.css";
+import styles from '../styles/Home.module.css';
 
-const Home: NextPage = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+import { withSSRGuest } from '../utils/withSSRGuest';
 
-  const { signIn } = useContext(AuthContext);
+export default function Home() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const { signIn } = useAuth();
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -23,19 +25,26 @@ const Home: NextPage = () => {
   }
 
   return (
-    <form className={styles.container} onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className={styles.container}>
       <input
         type="email"
         value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        onChange={e => setEmail(e.target.value)}
       />
+
       <input
         type="password"
         value={password}
-        onChange={(e) => setPassword(e.target.value)}
+        onChange={e => setPassword(e.target.value)}
       />
 
       <button type="submit">Entrar</button>
     </form>
   );
-};
+}
+
+export const getServerSideProps = withSSRGuest(async () => {
+  return {
+    props: {},
+  };
+});
